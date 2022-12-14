@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.IMUDrive;
 import org.firstinspires.ftc.teamcode.V5.EaglebotConfig_v5;
 
 /*
@@ -29,9 +30,7 @@ public class EaglebotAuto_v5 extends LinearOpMode {
     //Lets this program call functions inside of Eagle anConfig
     EaglebotConfig_v5 Eagle = new EaglebotConfig_v5(this);
 
-    //Lets this program call functions inside of Eagle anConfig
-    IMU_Orientation IMU = new IMU_Orientation();
-
+    IMUDrive IMUDrive = new IMUDrive();
     @Override
 
     public void runOpMode()
