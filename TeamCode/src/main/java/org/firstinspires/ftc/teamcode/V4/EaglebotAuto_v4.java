@@ -20,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
     1 - Home
 */
 
-@Autonomous
+//@Autonomous
 
 //sets program name to EaglebotAuto_v4 and includes linearOpMode
 public class EaglebotAuto_v4 extends LinearOpMode {

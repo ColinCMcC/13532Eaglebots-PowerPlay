@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.V5;
 
+import static com.qualcomm.hardware.bosch.BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+import static com.qualcomm.hardware.bosch.BNO055IMU.AngleUnit.DEGREES;
 import static com.qualcomm.hardware.bosch.BNO055IMU.SensorMode.IMU;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -12,6 +14,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
@@ -40,7 +45,7 @@ public class EaglebotConfig_v5 {
     /* Declare OpMode members. */
     private final LinearOpMode myOpMode;   // gain access to methods in the calling OpMode.
 
-
+    //Creates variables for all the devices
     DcMotor FLMotor = null;
     DcMotor BRMotor = null;
     DcMotor BLMotor = null;
@@ -56,10 +61,8 @@ public class EaglebotConfig_v5 {
     DistanceSensor backDist;
     DistanceSensor rightDist;
 
+    //IMU setups
     BNO055IMU imu;
-    Orientation lastAngles = new Orientation();
-    double globalAngle, power = -30,correction;
-    boolean aButton, bButton, touched;
 
     ElapsedTime runtime = new ElapsedTime();
 
@@ -110,12 +113,13 @@ public class EaglebotConfig_v5 {
         claw = myOpMode.hardwareMap.get(Servo.class, "Claw");
 
         //sets the parameters of the IMU in the control hub
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.mode = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled = false;
         imu = myOpMode.hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.mode                 = IMU;
+        parameters.angleUnit            = DEGREES;
+        parameters.accelUnit            = METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled       = false;
+        imu.initialize(parameters);
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
         myOpMode.telemetry.update();
@@ -138,10 +142,12 @@ public class EaglebotConfig_v5 {
 
         myOpMode.telemetry.addLine();
         myOpMode.telemetry.addData("Color Distance", Distance.getDistance(DistanceUnit.CM));
-
         myOpMode.telemetry.addData("leftDist", leftDist.getDistance(DistanceUnit.INCH));
         myOpMode.telemetry.addData("backDist", backDist.getDistance(DistanceUnit.INCH));
         myOpMode.telemetry.addData("rightDist", rightDist.getDistance(DistanceUnit.INCH));
+
+        myOpMode.telemetry.addLine();
+        myOpMode.telemetry.addData("IMU:", getHeading());
         myOpMode.telemetry.update();
     }//end checkData function
 
@@ -192,9 +198,10 @@ public class EaglebotConfig_v5 {
 
 
     public void liftHome() {
+        runtime.reset();
         //goes down until lift hits home
-        while (!home.isPressed()) {
-            liftMotor.setPower(-0.2);
+        while (!home.isPressed() && runtime.seconds() < 1.5) {
+            liftMotor.setPower(-0.1);
         }
 
         liftMotor.setPower(0);
@@ -209,18 +216,11 @@ public class EaglebotConfig_v5 {
 
 
     public int colorSense() {
-        runtime.reset();
         int result = 1;
 
-        move(-1.0,0.0,0.0, false);
-        while((myOpMode.opModeIsActive() && Distance.getDistance(DistanceUnit.CM) > 2) && (runtime.seconds() < 4.0)){
-            myOpMode.idle();
-        }// end move to cone color sense
-        stopDrive();
         //color sensor sees red
         if (ColorHue.red() * 1.25 > ColorHue.green() && ColorHue.red() * 1.25 > ColorHue.blue()) {
             stopDrive();
-            result = 1;
         }
 
         //color sensor sees green
@@ -236,11 +236,13 @@ public class EaglebotConfig_v5 {
     }// end colorSense
 
 
-    public void colorMoveDistLeft(){
+    public void colorMoveDistLeft() {
         double getColor = colorSense();
 
         while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 25){
+            rotateToZero();
             move(-1, 0, 0, false);
+            myOpMode.sleep(50);
         }
         stopDrive();
 
@@ -248,10 +250,14 @@ public class EaglebotConfig_v5 {
         if(getColor == 1){
             //move to correct zone
             while (myOpMode.opModeIsActive() && leftDist.getDistance(DistanceUnit.INCH) < 2){
+                rotateToZero();
                 move(0, -1, 0, false);
+                myOpMode.sleep(50);
             }
             while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30){
+                rotateToZero();
                 move(-1, 0, 0, false);
+                myOpMode.sleep(50);
             }
             stopDrive();
         }//end if color sensor sees red
@@ -260,7 +266,9 @@ public class EaglebotConfig_v5 {
         if(getColor == 2){
             //move more fully into the zone
             while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30) {
+                rotateToZero();
                 move(-1, 0, 0, false);
+                myOpMode.sleep(50);
             }
             stopDrive();
         }//end if color sensor sees green
@@ -269,10 +277,14 @@ public class EaglebotConfig_v5 {
         if(getColor == 3){
             //move to correct zone
             while (myOpMode.opModeIsActive() && leftDist.getDistance(DistanceUnit.INCH) < 45){
+                rotateToZero();
                 move(0, 1, 0, false);
+                myOpMode.sleep(50);
             }
             while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30){
+                rotateToZero();
                 move(-1, 0, 0, false);
+                myOpMode.sleep(50);
             }
             stopDrive();
         }//end if color sensor sees blue
@@ -282,46 +294,95 @@ public class EaglebotConfig_v5 {
         double getColor = colorSense();
 
         while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 25){
-            move(-1, 0, 0, false);
+           rotateToZero();
+           move(-1, 0, 0, false);
+           myOpMode.sleep(50);
         }
         stopDrive();
 
         //if color sensor sees red
         if(getColor == 1){
-            //move to correct zone
+            //move to red zone
             while (myOpMode.opModeIsActive() && rightDist.getDistance(DistanceUnit.INCH) < 50){
+                rotateToZero();
                 move(0, -1, 0, false);
+                myOpMode.sleep(50);
             }
             while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30){
+                rotateToZero();
                 move(-1, 0, 0, false);
+                myOpMode.sleep(50);
             }
             stopDrive();
         }//end if color sensor sees red
 
         //if color sensor sees green
         if(getColor == 2){
-            //move more fully into the zone
+            //move more fully into the green zone
             while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30) {
+                rotateToZero();
                 move(-1, 0, 0, false);
+                myOpMode.sleep(50);
             }
             stopDrive();
         }//end if color sensor sees green
 
         //if color sensor sees blue
         if(getColor == 3){
-            //move to correct zone
+            //move to blue zone
             while (myOpMode.opModeIsActive() && rightDist.getDistance(DistanceUnit.INCH) > 6){
+                rotateToZero();
                 move(0, 1, 0, false);
+                myOpMode.sleep(50);
             }
             while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30){
+                rotateToZero();
                 move(-1, 0, 0, false);
+                myOpMode.sleep(50);
             }
             stopDrive();
+
         }//end if color sensor sees blue
     }//end colorMoveDistRight
 
-    public void orientate(){
 
+    public void rideLeftWall(){
+        if (leftDist.getDistance(DistanceUnit.INCH) > 26.5) {
+            move(-0.5, 0.5, 0, false);
+        } else if (leftDist.getDistance(DistanceUnit.INCH) < 25.5) {
+            move(-0.5, -0.5, 0, false);
+        }
+    }//end rideLeftWall
+
+    public void rideRightWall() {
+        if (rightDist.getDistance(DistanceUnit.INCH) > 26.5) {
+            move(-0.5, 0.5, 0, false);
+        } else if (rightDist.getDistance(DistanceUnit.INCH) < 25.5) {
+            move(-0.5, -0.5, 0, false);
+        }
+    }//end rideRightWall
+
+
+    public double getHeading(){
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+        double heading = angles.firstAngle;
+        if(heading < -180) {
+            heading = heading + 360;
+        }
+        else if(heading > 180){
+            heading = heading - 360;
+        }
+        return heading;
+    }//end getHeading
+
+
+    public void rotateToZero(){
+
+        if (getHeading() > 0.005) {
+            move(0, 0, 0.2, false);
+        } else if (getHeading() < -0.005) {
+            move(0, 0, -0.2, false);
+        }
+        else{stopDrive();}
     }
-
 }//end class Eagle config

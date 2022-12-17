@@ -20,7 +20,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
     1 - Home
 */
 
-@TeleOp
+//@TeleOp
 
 public class EaglebotDrive_v4 extends LinearOpMode {
 

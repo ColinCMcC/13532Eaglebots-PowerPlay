@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.IMUDrive;
-import org.firstinspires.ftc.teamcode.V5.EaglebotConfig_v5;
 
 /*
     Motor Config
@@ -22,7 +20,7 @@ import org.firstinspires.ftc.teamcode.V5.EaglebotConfig_v5;
     1 - Home
 */
 
-//@Autonomous
+@Autonomous
 
 //sets program name to EaglebotAuto_v5 and includes linearOpMode
 public class EaglebotAuto_v5 extends LinearOpMode {
@@ -41,17 +39,37 @@ public class EaglebotAuto_v5 extends LinearOpMode {
         telemetry.addData("Autonomous:", "Ready");
         telemetry.update();
 
-
-        waitForStart();// Waits until start is pressed
+        // Waits until start is pressed
+        waitForStart();
         Eagle.liftHome();
         Eagle.claw.setPosition(0.0);
 
-        // sees what side it is on and runs appropriate code
-        if (Eagle.leftDist.getDistance(DistanceUnit.INCH) < Eagle.rightDist.getDistance(DistanceUnit.INCH)){
+        if (Eagle.leftDist.getDistance(DistanceUnit.INCH) < Eagle.rightDist.getDistance(DistanceUnit.INCH)) {
+            boolean autoRun = false;
+            while (opModeIsActive() && !autoRun) {
+                Eagle.rotateToZero();
+                Eagle.rideLeftWall();
+
+                if (Eagle.Distance.getDistance(DistanceUnit.INCH) < 2) {
+                    autoRun = true;
+                }
+            }
+            autoRun = false;
             Eagle.colorMoveDistLeft();
-        }else{
+
+        }else {
+            boolean autoRun = false;
+            while (opModeIsActive() && !autoRun) {
+                Eagle.rotateToZero();
+                Eagle.rideRightWall();
+
+                if (Eagle.Distance.getDistance(DistanceUnit.INCH) < 2) {
+                    autoRun = true;
+                }
+            }
+            autoRun = false;
+
             Eagle.colorMoveDistRight();
         }
-
     }// end runOpMode function
 }//end EagleAuto class
