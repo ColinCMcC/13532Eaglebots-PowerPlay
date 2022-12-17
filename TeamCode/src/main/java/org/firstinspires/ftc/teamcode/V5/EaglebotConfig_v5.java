@@ -375,7 +375,6 @@ public class EaglebotConfig_v5 {
         return heading;
     }//end getHeading
 
-
     public void rotateToZero(){
 
         if (getHeading() > 0.005) {
