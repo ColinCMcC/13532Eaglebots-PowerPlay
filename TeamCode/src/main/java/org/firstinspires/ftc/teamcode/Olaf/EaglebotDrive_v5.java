@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.V5;
+package org.firstinspires.ftc.teamcode.Olaf;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -45,15 +45,15 @@ public class EaglebotDrive_v5 extends LinearOpMode {
 
                 //stops lift from going too high and breaking the string
                 if (Eagle.liftMotor.getCurrentPosition() > 4800) {
-                    Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     Eagle.liftMotor.setTargetPosition(4780);
+                    Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     Eagle.liftMotor.setPower(0.5);
                     Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     Eagle.liftMotor.setPower(0);
                 }
                 if (Eagle.liftMotor.getCurrentPosition() < 0) {
-                    Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     Eagle.liftMotor.setTargetPosition(10);
+                    Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     Eagle.liftMotor.setPower(0.5);
                     Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     Eagle.liftMotor.setPower(0);
@@ -62,7 +62,6 @@ public class EaglebotDrive_v5 extends LinearOpMode {
                 Eagle.move(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.a);
                 Eagle.lift(-gamepad2.left_stick_y, gamepad2.left_trigger, gamepad2.a);
 
-                Eagle.rotateToZero();
             }//end while opModeIsActive
     }//end void runOpMode
 }//Eagle drive  class
