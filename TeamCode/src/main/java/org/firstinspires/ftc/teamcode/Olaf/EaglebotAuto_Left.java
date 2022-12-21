@@ -47,14 +47,15 @@ public class EaglebotAuto_Left extends LinearOpMode {
         while (opModeIsActive() && !autoRun && Eagle.backDist.getDistance(DistanceUnit.INCH) < 35) {
             Eagle.rotateToZero();
             Eagle.rideLeftWall(24.5);
-            sleep(200);
+            sleep(200);// Delays before the next run of rotateToZero
 
             if (Eagle.Distance.getDistance(DistanceUnit.INCH) < 2) {
                 autoRun = true;
             }
         }
-        autoRun = false;
-        Eagle.claw.setPosition(1);
+
+        autoRun = false;//resets autoRun for another iteration if necessary
+        Eagle.claw.setPosition(1);//grabs cone to not run over it
         Eagle.colorMoveDistLeft();
     }// end runOpMode function
 }//end EagleAuto class

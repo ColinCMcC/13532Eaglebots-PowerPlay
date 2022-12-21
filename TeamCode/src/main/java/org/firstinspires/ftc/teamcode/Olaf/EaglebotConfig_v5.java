@@ -205,7 +205,7 @@ EaglebotConfig_v5 {
     public void liftHome() {
         runtime.reset();
         //goes down until lift hits home
-        while (!home.isPressed() && runtime.seconds() < 1) {
+        while (!home.isPressed() && runtime.seconds() < 2) {
             liftMotor.setPower(-0.1);
         }
 
@@ -235,19 +235,19 @@ EaglebotConfig_v5 {
         }
 
         //color sensor sees blue
-        else result = 3;
+        else {result = 3;}
 
         return (result);
     }// end colorSense
 
 
     public void colorMoveDistLeft() {
-        double getColor = colorSense();
+        double getColor = colorSense();// Runs color sense to get the color of the cone
 
-        //if color sensor sees red
+        // If color sensor sees red
         if(getColor == 1){
             //move to correct zone
-            while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30){
+            while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30){//runs until robot is far enough away from back wall
                 rotateToZero();
                 move(-1, 0, 0, false);
                 myOpMode.sleep(500);
@@ -342,20 +342,20 @@ EaglebotConfig_v5 {
 
 
     public void rideLeftWall(double dist){
-        if (leftDist.getDistance(DistanceUnit.INCH) > dist +0.5) {
-            move(-0.5, -0.15, 0, false);
+        if (leftDist.getDistance(DistanceUnit.INCH) > dist + 0.5) {
+            move(-0.5, -0.1, 0, false);
         } else if (leftDist.getDistance(DistanceUnit.INCH) < dist - 0.5) {
-            move(-0.5, 0.15, 0, false);
+            move(-0.5, 0.1, 0, false);
         }else {
             stopDrive();
         }
     }//end rideLeftWall
 
     public void rideRightWall(double dist) {
-        if (rightDist.getDistance(DistanceUnit.INCH) > dist) {
-            move(-0.5, 0.15, 0, false);
-        } else if (rightDist.getDistance(DistanceUnit.INCH) < dist) {
-            move(-0.5, -0.15, 0, false);
+        if (rightDist.getDistance(DistanceUnit.INCH) > dist + 0.5) {
+            move(-0.5, 0.1, 0, false);
+        } else if (rightDist.getDistance(DistanceUnit.INCH) < dist - 0.5) {
+            move(-0.5, -0.1, 0, false);
         }else{
             stopDrive();
         }
@@ -374,14 +374,15 @@ EaglebotConfig_v5 {
         return heading;
     }//end getHeading
 
+
     public void rotateToZero(){
 
         if (getHeading() > 0.005) {
-            move(0, 0, 0.2, false);
+            move(0, 0, 0.1, false);
             myOpMode.sleep(100);
         } else if (getHeading() < -0.005) {
-            move(0, 0, -0.2, false);
-        myOpMode.sleep(100);
+            move(0, 0, -0.1, false);
+        myOpMode.sleep(250);// Gives some time to complete action
         }
         else{stopDrive();}
     }

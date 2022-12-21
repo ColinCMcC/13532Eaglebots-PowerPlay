@@ -47,7 +47,7 @@ public class EaglebotAuto_backup_Left extends LinearOpMode {
         runtime.reset();
 
         while (Eagle.leftDist.getDistance(DistanceUnit.INCH) > 3 && runtime.seconds() < 3) {
-            Eagle.move(0, -1, 0, false);//drive left into side terminal
+            Eagle.move(0, -1, 0, false);//drive into left side terminal
         }
         Eagle.stopDrive();
     }// end runOpMode function
