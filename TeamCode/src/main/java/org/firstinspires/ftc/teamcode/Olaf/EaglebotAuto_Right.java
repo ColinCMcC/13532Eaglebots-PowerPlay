@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Olaf;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -18,7 +17,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
     0 - Claw
 
     Digital Config
-    1 - Home
+    0 - Home
+
+    I2C Config
+    0 - 0- IMU
+    0 - 1 - leftDist
+    1 - 0 - backDist
+    2 - 0 - rightDist
+    3 - 0 - V3color
 */
 
 @Autonomous
@@ -29,14 +35,10 @@ public class EaglebotAuto_Right extends LinearOpMode {
     //Lets this program call functions inside of Eagle anConfig
     EaglebotConfig_v5 Eagle = new EaglebotConfig_v5(this);
 
-    IMUDrive IMUDrive = new IMUDrive();
 
-    ElapsedTime runtime = new ElapsedTime();
-
-    public void runOpMode()
-    {
+    public void runOpMode() {
         Eagle.init();// initialize hardware and sensors
-        
+
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Autonomous:", "Ready");
         telemetry.update();
@@ -44,18 +46,15 @@ public class EaglebotAuto_Right extends LinearOpMode {
         // Waits until start is pressed
         waitForStart();
         Eagle.liftHome();
-        Eagle.claw.setPosition(0.0);
+        Eagle.claw.setPosition(0.0);//makes sure claw is all the way open to start
 
-        boolean autoRun = false;
-        while (opModeIsActive() && !autoRun && Eagle.backDist.getDistance(DistanceUnit.INCH) < 35) {
-            Eagle.rotateToZero();
-            Eagle.rideRightWall(24.5);
-            sleep(200);
+        while (opModeIsActive() && Eagle.Distance.getDistance(DistanceUnit.INCH) > 2 && Eagle.backDist.getDistance(DistanceUnit.INCH) < 48) {// Moves up to near cone while staying straight
 
-            if (Eagle.Distance.getDistance(DistanceUnit.INCH) < 2) {autoRun = true;}
+            double strafePower = (Eagle.rightDist.getDistance(DistanceUnit.INCH) - 27) / 4;// Calculates power to strafe back to correct position
+            double turnPower = Eagle.getHeading() / 50;// Calculates power to spin back to straight
+            Eagle.move(-0.3, strafePower, turnPower, false);
+            sleep(250);
         }
-        Eagle.claw.setPosition(1);
-        autoRun = false;
-        Eagle.colorMoveDistRight();
+        Eagle.colorMove(2);
     }// end runOpMode function
 }//end EagleAuto class

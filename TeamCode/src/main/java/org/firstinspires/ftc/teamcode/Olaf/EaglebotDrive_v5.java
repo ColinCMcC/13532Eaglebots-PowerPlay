@@ -3,11 +3,9 @@ package org.firstinspires.ftc.teamcode.Olaf;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 /*
     Motor Config
-    0 - LMotor white
+    0 - Lmotor white
     1 - RMotor black
     2 - FMotor red
     3 - BMotor blue
@@ -17,7 +15,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
     0 - Claw
 
     Digital Config
-    1 - Home
+    0 - Home
+
+    I2C Config
+    0 - 0- IMU
+    0 - 1 - leftDist
+    1 - 0 - backDist
+    2 - 0 - rightDist
+    3 - 0 - V3color
 */
 
 @TeleOp
@@ -27,9 +32,6 @@ public class EaglebotDrive_v5 extends LinearOpMode {
     //Lets this program call functions inside of DriveConfig
    EaglebotConfig_v5 Eagle = new EaglebotConfig_v5(this);
 
-    //Declare OpMode members.
-    ElapsedTime runtime = new ElapsedTime();
-    
     @Override
 
     public void runOpMode() {
@@ -44,8 +46,8 @@ public class EaglebotDrive_v5 extends LinearOpMode {
                 Eagle.checkData();//sends debug info to datapad
 
                 //stops lift from going too high and breaking the string
-                if (Eagle.liftMotor.getCurrentPosition() > 4800) {
-                    Eagle.liftMotor.setTargetPosition(4780);
+                if (Eagle.liftMotor.getCurrentPosition() > 5200) {
+                    Eagle.liftMotor.setTargetPosition(5180);
                     Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     Eagle.liftMotor.setPower(0.5);
                     Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
