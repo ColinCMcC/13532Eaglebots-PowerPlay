@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.V5;
+package org.firstinspires.ftc.teamcode.Olaf;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -22,10 +22,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 
-public class EaglebotDrive_v5 extends LinearOpMode {
+public class EaglebotDrive extends LinearOpMode {
 
     //Lets this program call functions inside of DriveConfig
-   EaglebotConfig_v5 Eagle = new EaglebotConfig_v5(this);
+   EaglebotConfig Eagle = new EaglebotConfig(this);
 
     //Declare OpMode members.
     ElapsedTime runtime = new ElapsedTime();
@@ -37,6 +37,9 @@ public class EaglebotDrive_v5 extends LinearOpMode {
 
             // Wait for the game to start (driver presses PLAY and runs until STOP is pressed)
             waitForStart();
+      /*  while (opModeIsActive()) {// uncomment for diagnostic mode
+            Eagle.checkData();//sends debug info to datapad
+        }*/
 
             Eagle.liftHome();
 
@@ -44,25 +47,26 @@ public class EaglebotDrive_v5 extends LinearOpMode {
                 Eagle.checkData();//sends debug info to datapad
 
                 //stops lift from going too high and breaking the string
-                if (Eagle.liftMotor.getCurrentPosition() > 4800) {
+                if (Eagle.liftMotor.getCurrentPosition() > 15680) {
+                    Eagle.liftMotor.setTargetPosition(15600);
                     Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    Eagle.liftMotor.setTargetPosition(4780);
                     Eagle.liftMotor.setPower(0.5);
                     Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    Eagle.liftMotor.setPower(0);
+                    Eagle.liftMotor.setPower(0.0);
                 }
                 if (Eagle.liftMotor.getCurrentPosition() < 0) {
-                    Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     Eagle.liftMotor.setTargetPosition(10);
+                    Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     Eagle.liftMotor.setPower(0.5);
                     Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    Eagle.liftMotor.setPower(0);
+                    Eagle.liftMotor.setPower(0.0);
                 }
-
+                //move(drive, strafe, turn, boolean boost)
                 Eagle.move(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.a);
-                Eagle.lift(-gamepad2.left_stick_y, gamepad2.left_trigger, gamepad2.a);
+                //lift(liftCtrl, clawCtrl, boolean slow)
+                Eagle.lift(-gamepad2.left_stick_y, gamepad2.right_trigger, gamepad2.a);
 
-                Eagle.rotateToZero();
             }//end while opModeIsActive
+
     }//end void runOpMode
 }//Eagle drive  class

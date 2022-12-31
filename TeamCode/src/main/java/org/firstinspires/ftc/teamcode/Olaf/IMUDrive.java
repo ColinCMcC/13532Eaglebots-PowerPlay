@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.V5;
+package org.firstinspires.ftc.teamcode.Olaf;
 
 import static com.qualcomm.hardware.bosch.BNO055IMU.AngleUnit.DEGREES;
 
@@ -99,8 +99,10 @@ public class IMUDrive extends LinearOpMode {
     }
     public void drive() {
         double rotate = gamepad1.right_stick_x/4;
-        double stick_x = gamepad1.left_stick_x * Math.sqrt(Math.pow(1-Math.abs(rotate), 2)/2); //Accounts for rotate when limiting magnitude to be less than 1
+        //Accounts for rotate when limiting magnitude to be less than 1
+        double stick_x = gamepad1.left_stick_x * Math.sqrt(Math.pow(1-Math.abs(rotate), 2)/2);
         double stick_y = gamepad1.left_stick_y * Math.sqrt(Math.pow(1-Math.abs(rotate), 2)/2);
+
         double theta;
         double Px;
         double Py;
@@ -132,7 +134,6 @@ public class IMUDrive extends LinearOpMode {
         else if(gamepad1.dpad_down){
             stick_y = 0.5;
         }
-
 
         //MOVEMENT
         theta = Math.atan2(stick_y, stick_x) - gyroAngle - (Math.PI / 2);
