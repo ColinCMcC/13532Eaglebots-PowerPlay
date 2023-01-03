@@ -218,9 +218,6 @@ public class EaglebotConfig_v5 {
     }// End liftHome
 
 
-    public void stopLift() {liftMotor.setPower(0);}// stops lift motor if necessary
-
-
     public int colorSense() {
         int result = 1;
 
@@ -246,80 +243,84 @@ public class EaglebotConfig_v5 {
     public void colorMove(int side){
         double getColor = colorSense();// Runs color sense to get the color of the cone
 
-        if (side == 1){
-            // If color sensor sees red
+        if (side == 1){// If color sensor sees red
             if (getColor == 1){
-                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 28){// Runs until robot is far enough away from back wall
-                    move(-1, 0, 0, false);
-                    myOpMode.sleep(500);
+                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 26){// Runs until robot is far enough away from back wall
+                    move(-0.5, 0, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);// Sets how often it runs this loop
                 }
                 while (myOpMode.opModeIsActive() && leftDist.getDistance(DistanceUnit.INCH) > 2){// Moves to the left zone
-                    move(0, -1, 0, false);
-                    myOpMode.sleep(500);
+                    move(0, -0.3, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);
                 }stopDrive();
             }// End if color sensor sees red
 
-            // If color sensor sees green
-            if(getColor == 2){
+            if(getColor == 2){// If color sensor sees green
                 //move more fully into the zone
-                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 28) {
-                    move(-1, 0, 0, false);
-                    myOpMode.sleep(500);
+                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30) {
+                    move(-0.5, 0, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);
                 }
                 stopDrive();
             }// End if color sensor sees green
 
-            // If color sensor sees blue
-            if(getColor == 3){
+            if(getColor == 3){// If color sensor sees blue
                 //move to correct zone
-                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30){
-                    move(-1, 0, 0, false);
-                    myOpMode.sleep(500);
+                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 26){
+                    move(-0.5, 0, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);
                 }
-                while (myOpMode.opModeIsActive() && leftDist.getDistance(DistanceUnit.INCH) < 45){
-                    move(0, 1, 0, false);
-                    myOpMode.sleep(500);
+                while (myOpMode.opModeIsActive() && leftDist.getDistance(DistanceUnit.INCH) < 26){
+                    move(0, 0.5, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);
                 }
                 stopDrive();
             }// End if color sensor sees blue
         }// End if side == 1
 
+
         else if (side == 2){
-            // If color sensor sees red
-            if(getColor == 1){
+            if(getColor == 1){// If color sensor sees red
                 //move to red zone
-                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30){
-                    move(-1, 0, 0, false);
-                    myOpMode.sleep(500);
+                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 26){
+                    move(-0.5, 0, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);
                 }
                 while (myOpMode.opModeIsActive() && rightDist.getDistance(DistanceUnit.INCH) < 50){
-                    move(0, -1, 0, false);
-                    myOpMode.sleep(500);
+                    move(0, -0.5, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);
                 }
-
                 stopDrive();
             }// End if color sensor sees red
 
-            // If color sensor sees green
-            if(getColor == 2){
+            if(getColor == 2){// If color sensor sees green
                 //move more fully into the green zone
                 while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30) {
-                    move(-1, 0, 0, false);
-                    myOpMode.sleep(500);
+                    move(-0.5, 0, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);
                 }
                 stopDrive();
             }// End if color sensor sees green
 
-            // If color sensor sees blue
-            if(getColor == 3){
+            if(getColor == 3){// If color sensor sees blue
                 //move to blue zone
-                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30){
-                    move(-1, 0, 0, false);
-                    myOpMode.sleep(500);
+                while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 26){
+                    move(-0.5, 0, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);
                 }
-                while (myOpMode.opModeIsActive() && rightDist.getDistance(DistanceUnit.INCH) > 6){
-                    move(0, 1, 0, false);
-                    myOpMode.sleep(500);
+                while (myOpMode.opModeIsActive() && rightDist.getDistance(DistanceUnit.INCH) > 2){
+                    move(0, 0.5, 0, false);
+                    checkData();
+                    myOpMode.sleep(100);
                 }
                 stopDrive();
             }// End if color sensor sees blue
