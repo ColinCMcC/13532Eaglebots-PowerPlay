@@ -42,12 +42,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
     3 - 0 - V3color
 */
 
-public class EaglebotConfig_v5 {
+public class EaglebotConfig {
 
     /* Declare OpMode members. */
     private final LinearOpMode myOpMode;   // gain access to methods in the calling OpMode.
 
-    //Creates variables for all the devices
+    // Creates variables for all the devices
     DcMotor FLMotor = null;
     DcMotor BRMotor = null;
     DcMotor BLMotor = null;
@@ -69,16 +69,11 @@ public class EaglebotConfig_v5 {
     ElapsedTime runtime = new ElapsedTime();
 
     //Define a constructor that allows the OpMode to pass a reference to itself.
-    public EaglebotConfig_v5(LinearOpMode opmode) {myOpMode = opmode;}//end EagleConfig
+    public EaglebotConfig(LinearOpMode opmode) {myOpMode = opmode;}
 
 
     public void init() {
-        ColorHue = myOpMode.hardwareMap.get(ColorSensor.class, "V3color");
-        Distance = myOpMode.hardwareMap.get(DistanceSensor.class, "V3color");
 
-        leftDist = myOpMode.hardwareMap.get(DistanceSensor.class, "leftDist");
-        backDist = myOpMode.hardwareMap.get(DistanceSensor.class, "backDist");
-        rightDist = myOpMode.hardwareMap.get(DistanceSensor.class, "rightDist");
 
         // Define and Initialize Motors (note: need to use reference to actual OpMode).
         FLMotor = myOpMode.hardwareMap.get(DcMotor.class, "LMotor");
@@ -114,7 +109,14 @@ public class EaglebotConfig_v5 {
         //Servo claw config
         claw = myOpMode.hardwareMap.get(Servo.class, "Claw");
 
-        //sets the parameters of the IMU in the control hub
+        //Sensors config
+        ColorHue = myOpMode.hardwareMap.get(ColorSensor.class, "V3color");
+        Distance = myOpMode.hardwareMap.get(DistanceSensor.class, "V3color");
+        leftDist = myOpMode.hardwareMap.get(DistanceSensor.class, "leftDist");
+        backDist = myOpMode.hardwareMap.get(DistanceSensor.class, "backDist");
+        rightDist = myOpMode.hardwareMap.get(DistanceSensor.class, "rightDist");
+
+        // Sets the parameters of the IMU in the control hub
         imu = myOpMode.hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode                 = IMU;
@@ -125,17 +127,20 @@ public class EaglebotConfig_v5 {
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
         myOpMode.telemetry.update();
-    }//end init function
+    }// End init function
 
 
-    //sends info to datapad for debug and testing
+    // Sends info to datapad for debug and testing
     public void checkData() {
         myOpMode.telemetry.addLine();
         myOpMode.telemetry.addData("R>", FLMotor.getCurrentPosition());
         myOpMode.telemetry.addData("B>", BLMotor.getCurrentPosition());
         myOpMode.telemetry.addData("L>", BRMotor.getCurrentPosition());
         myOpMode.telemetry.addData("F>", FRMotor.getCurrentPosition());
+
+        myOpMode.telemetry.addLine();
         myOpMode.telemetry.addData("Lift", liftMotor.getCurrentPosition());
+        myOpMode.telemetry.addData("Claw", claw.getPosition());
 
         myOpMode.telemetry.addLine();
         myOpMode.telemetry.addData("Red", ColorHue.red());
@@ -151,7 +156,7 @@ public class EaglebotConfig_v5 {
         myOpMode.telemetry.addLine();
         myOpMode.telemetry.addData("IMU:", getHeading());
         myOpMode.telemetry.update();
-    }//end checkData function
+    }// End checkData function
 
 
     public void move(double drive, double strafe, double turn, boolean boost){
@@ -163,7 +168,7 @@ public class EaglebotConfig_v5 {
         if (boost) {
             max = 0.75;
         } else {
-            max = 0.35;
+            max = 0.33;
         }
 
         //send calculated power to wheels
@@ -171,16 +176,42 @@ public class EaglebotConfig_v5 {
         BLMotor.setPower(((drive + strafe - turn) * max) * leftAdj);
         BRMotor.setPower(((drive - strafe + turn) * max) * rightAdj);
         FRMotor.setPower(((drive + strafe + turn) * max) * rightAdj);
-    }// end move
+    }// End move
 
 
-    //stops all motors if necessary
+    public void fieldMove(double x, double y, double turn, boolean boost){
+        double heading = Math.atan2(x, y);
+        double power = Math.sqrt(Math.pow(x, x) + Math.pow(y, y));
+        double qPi = Math.PI / 4;
+        double max = 0.33;
+
+        if (boost){
+            max = 1;
+        }else{
+            max = 0.33;
+        }
+
+        double FL = -Math.sin(heading + qPi) * power - turn;
+        double BL = -Math.cos(heading + qPi) * power - turn;
+        double BR = Math.sin(heading + qPi) * power - turn;
+        double FR = Math.cos(heading + qPi) * power - turn;
+
+        if (Math.abs(FL) > 1)
+
+        FLMotor.setPower(FL);
+        BLMotor.setPower(BL);
+        BRMotor.setPower(BR);
+        FRMotor.setPower(FR);
+    }
+
+
+    // Stops all motors if necessary
     public void stopDrive() {
         FLMotor.setPower(0.0);
         BLMotor.setPower(0.0);
         BRMotor.setPower(0.0);
         FRMotor.setPower(0.0);
-    }// end stopDrive
+    }// End stopDrive
 
 
     public void lift(double liftCtrl, double clawCtrl, boolean slow) {
@@ -194,25 +225,26 @@ public class EaglebotConfig_v5 {
         }
 
         if (home.isPressed() && myOpMode.gamepad2.left_stick_y > 0) {
-            max =0;
+            max = 0;
         }
 
-        liftMotor.setPower((liftCtrl * max) + 0.002);
+        liftMotor.setPower(liftCtrl * max);
 
         claw.setPosition(clawCtrl / 2);
-    }// end lift
+    }// End lift
 
 
     public void liftHome() {
         runtime.reset();
-        //goes down until lift hits home
+
+        // Goes down until lift hits home
         while (!home.isPressed() && runtime.seconds() < 2) {
             liftMotor.setPower(-0.1);
         }
 
         liftMotor.setPower(0);
 
-        //sets liftMotor encoder to 0 and allows it to go to encoder position
+        // Sets liftMotor encoder to 0 and allows it to go to encoder position
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }// End liftHome
@@ -236,95 +268,109 @@ public class EaglebotConfig_v5 {
         else {result = 3;}
 
         return (result);
-    }// end colorSense
+    }// End colorSense
 
 
-    // Side 1 is left, Side 2 is right
-    public void colorMove(int side){
-        double getColor = colorSense();// Runs color sense to get the color of the cone
-
-        if (side == 1){// If color sensor sees red
-            if (getColor == 1){
+    public void colorMove(double side, double color){
+        if (side == 1){
+            if (color == 1){
                 while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 26){// Runs until robot is far enough away from back wall
-                    move(-0.5, 0, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(-0.5, 0, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);// Sets how often it runs this loop
                 }
                 while (myOpMode.opModeIsActive() && leftDist.getDistance(DistanceUnit.INCH) > 2){// Moves to the left zone
-                    move(0, -0.3, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(0, -0.3, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);
-                }stopDrive();
+                }
+                stopDrive();
             }// End if color sensor sees red
 
-            if(getColor == 2){// If color sensor sees green
+            if(color == 2){// If color sensor sees green
                 //move more fully into the zone
                 while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30) {
-                    move(-0.5, 0, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(-0.5, 0, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);
                 }
                 stopDrive();
             }// End if color sensor sees green
 
-            if(getColor == 3){// If color sensor sees blue
+            if(color == 3){// If color sensor sees blue
                 //move to correct zone
                 while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 26){
-                    move(-0.5, 0, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(-0.5, 0, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);
                 }
                 while (myOpMode.opModeIsActive() && leftDist.getDistance(DistanceUnit.INCH) < 26){
-                    move(0, 0.5, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(0, 0.5, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);
                 }
-                stopDrive();
             }// End if color sensor sees blue
-        }// End if side == 1
-
+        }
 
         else if (side == 2){
-            if(getColor == 1){// If color sensor sees red
+            if(color == 1){// If color sensor sees red
                 //move to red zone
                 while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 26){
-                    move(-0.5, 0, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(-0.5, 0, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);
                 }
                 while (myOpMode.opModeIsActive() && rightDist.getDistance(DistanceUnit.INCH) < 50){
-                    move(0, -0.5, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(0, -0.5, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);
                 }
-                stopDrive();
             }// End if color sensor sees red
 
-            if(getColor == 2){// If color sensor sees green
+            if(color == 2){// If color sensor sees green
                 //move more fully into the green zone
                 while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 30) {
-                    move(-0.5, 0, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(-0.5, 0, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);
                 }
-                stopDrive();
             }// End if color sensor sees green
 
-            if(getColor == 3){// If color sensor sees blue
+            if(color == 3){// If color sensor sees blue
                 //move to blue zone
                 while (myOpMode.opModeIsActive() && backDist.getDistance(DistanceUnit.INCH) < 26){
-                    move(-0.5, 0, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(-0.5, 0, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);
                 }
                 while (myOpMode.opModeIsActive() && rightDist.getDistance(DistanceUnit.INCH) > 2){
-                    move(0, 0.5, 0, false);
+                    double turnPower = getHeading();// Keeps robot straight
+
+                    move(0, 0.5, turnPower / 20, false);
                     checkData();
                     myOpMode.sleep(100);
                 }
-                stopDrive();
             }// End if color sensor sees blue
-        }// End else if side == 2
+        }// End if side == 2
+        stopDrive();
     }// End colorMove
 
 
@@ -338,6 +384,6 @@ public class EaglebotConfig_v5 {
             heading = heading - 360;
         }
         return heading;
-    }//end getHeading
+    }// End getHeading
 
-}//end class Eagle config
+}// End class Eagle config

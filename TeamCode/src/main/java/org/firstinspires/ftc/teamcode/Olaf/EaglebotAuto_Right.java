@@ -33,8 +33,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class EaglebotAuto_Right extends LinearOpMode {
 
     //Lets this program call functions inside of Eagle anConfig
-    EaglebotConfig_v5 Eagle = new EaglebotConfig_v5(this);
-
+    EaglebotConfig Eagle = new EaglebotConfig(this);
 
     public void runOpMode() {
         Eagle.init();// initialize hardware and sensors
@@ -48,13 +47,15 @@ public class EaglebotAuto_Right extends LinearOpMode {
         Eagle.claw.setPosition(0.0);// Makes sure claw is all the way open to start
 
         while (opModeIsActive() && Eagle.Distance.getDistance(DistanceUnit.INCH) > 2 && Eagle.backDist.getDistance(DistanceUnit.INCH) < 48) {// Moves up to near cone while staying straight
-
             double strafePower = Eagle.rightDist.getDistance(DistanceUnit.INCH) - 27;// Calculates power to strafe back to correct position
             double turnPower = Eagle.getHeading();// Calculates power to spin back to straight
-            Eagle.move(-0.3, strafePower / 4, turnPower / 50, false);
-            sleep(100);// Sets how often it resets power
+
+            Eagle.move(-0.3, strafePower / 4, turnPower / 50, true);
+            sleep(100);// Sets how often it loops
             Eagle.checkData();
         }
-        Eagle.colorMove(2);
+        int color = Eagle.colorSense();
+
+        Eagle.colorMove(2, color);
     }// end runOpMode function
 }//end EagleAuto class

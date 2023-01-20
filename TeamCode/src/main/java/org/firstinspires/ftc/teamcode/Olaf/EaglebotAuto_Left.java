@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Olaf;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -33,7 +34,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class EaglebotAuto_Left extends LinearOpMode {
 
     //Lets this program call functions inside of Eagle anConfig
-    EaglebotConfig_v5 Eagle = new EaglebotConfig_v5(this);
+    EaglebotConfig Eagle = new EaglebotConfig(this);
 
 
     public void runOpMode() {
@@ -43,17 +44,89 @@ public class EaglebotAuto_Left extends LinearOpMode {
         telemetry.update();
 
         waitForStart();// Waits until start is pressed
-        Eagle.liftHome();
         Eagle.claw.setPosition(0.0);// Makes sure claw is all the way open to start
+        Eagle.liftHome();// Homes the lift
 
+        Eagle.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        Eagle.claw.setPosition(1.0);// Grabs preloaded cone
+        sleep(500);
+
+        // Move to cone to get color
         while (opModeIsActive() && Eagle.Distance.getDistance(DistanceUnit.INCH) > 2 && Eagle.backDist.getDistance(DistanceUnit.INCH) < 48) {// Moves up to near cone while staying straight
-
             double strafePower = -Eagle.leftDist.getDistance(DistanceUnit.INCH) - 27;// Calculates power to strafe back to correct position
-            double turnPower = Eagle.getHeading();// Calculates power to spin back to straight
-            Eagle.move(-0.3, strafePower / 4, turnPower / 50, false);
-            sleep(100);
+            double turnPower = Eagle.getHeading();// Keeps robot straight
+
+            Eagle.move(-0.3, strafePower / 4, turnPower / 50, true);
+            sleep(100);// Sets how often it loops
             Eagle.checkData();
         }
-        Eagle.colorMove(1);
+
+        int color = Eagle.colorSense();// Puts cone color into memory for later use
+
+        // Moves to the top of B2
+        while (opModeIsActive() && Eagle.backDist.getDistance(DistanceUnit.INCH) < 25){
+            double turnPower = Eagle.getHeading();// Keeps robot straight
+
+            Eagle.move(0.3, 0, turnPower / 20, true);
+            sleep(100);// Sets how often it loops
+        }
+
+        Eagle.liftMotor.setTargetPosition(6000);
+        while (Eagle.liftMotor.isBusy()){
+            idle();
+        }
+
+        // Moves to the pole at the top right of B2
+        while (opModeIsActive() && Eagle.leftDist.getDistance(DistanceUnit.INCH) < 40){
+            double turnPower = Eagle.getHeading();// Keeps robot straight
+
+            Eagle.move(0, 0.3, turnPower / 20, true);
+            sleep(100);// Sets how often it loops
+        }
+        Eagle.stopDrive();
+
+        Eagle.claw.setPosition(0.0);// Drops cone onto pole
+        sleep(500);
+
+        // Moves to the top center of B2
+        while (opModeIsActive() && Eagle.leftDist.getDistance(DistanceUnit.INCH) > 26){
+            double turnPower = Eagle.getHeading();// Keeps robot straight
+
+            Eagle.move(0, -0.3, turnPower, true);
+            sleep(100);// Sets how often it loops
+        }
+
+        // Moves to the center of B3
+        while (opModeIsActive() && Eagle.backDist.getDistance(DistanceUnit.INCH) < 48){
+            double turnPower = Eagle.getHeading();// Keeps robot straight
+
+            Eagle.move(-0.3, 0, turnPower / 20, true);
+            sleep(100);// Sets how often it loops
+        }
+
+        // Turns to the left
+        while (opModeIsActive()){
+            double turnPower = Eagle.getHeading() - 90;// Turns robot to be facing 90 degrees to the left
+
+            Eagle.move(0, 0, turnPower / 20, true);
+            sleep(100);// Sets how often it loops
+        }
+
+        // Moves to the cone stack
+        while (opModeIsActive() && Eagle.Distance.getDistance(DistanceUnit.INCH) > 2){
+            double drivePower = Eagle.Distance.getDistance(DistanceUnit.INCH);
+            double turnPower = Eagle.getHeading();// Keeps robot straight
+
+            Eagle.move(-drivePower / 10, 0, turnPower / 20, true);
+            sleep(100);// Sets how often it loops
+        }
+
+        Eagle.liftMotor.setTargetPosition(1000);// Lifts claw to correct height
+        sleep(500);
+        Eagle.claw.setPosition(1.0);// Grabs cone
+        sleep(500);
+
+        Eagle.colorMove(1, color);// Side 1 is left, color is what the cone was set to
     }// end runOpMode function
 }//end EagleAuto class

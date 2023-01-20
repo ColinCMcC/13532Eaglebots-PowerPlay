@@ -34,7 +34,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class EaglebotAuto_backup_Right extends LinearOpMode {
 
     //Lets this program call functions inside of Eagle anConfig
-EaglebotConfig_v5 Eagle = new EaglebotConfig_v5(this);
+EaglebotConfig Eagle = new EaglebotConfig(this);
 
     ElapsedTime runtime = new ElapsedTime();
 
@@ -52,12 +52,9 @@ EaglebotConfig_v5 Eagle = new EaglebotConfig_v5(this);
         Eagle.claw.setPosition(0.0);
         runtime.reset();
 
-        while (Eagle.rightDist.getDistance(DistanceUnit.INCH) > 3 && runtime.seconds() < 3){
-            Eagle.move(0, -1, 0, false);// Drive into right side terminal
-        }
-        runtime.reset();
-        while (Eagle.backDist.getDistance(DistanceUnit.INCH) > 3 && runtime.seconds() < 2){// Move back to make sure it is fully in the terminal
-            Eagle.move(0.5, 0, 0, false);
+        while (opModeIsActive() && runtime.seconds() < 5){
+            double turnPower = Eagle.getHeading();
+            Eagle.move(0.2, 0.2, turnPower / 20, false);
         }
         Eagle.stopDrive();
     }// end runOpMode function
