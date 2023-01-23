@@ -72,7 +72,9 @@ public class EaglebotAuto_Left extends LinearOpMode {
             sleep(100);// Sets how often it loops
         }
 
-        Eagle.liftMotor.setTargetPosition(6000);
+        // Lift motor to medium pole
+        Eagle.liftMotor.setTargetPosition(2000);
+        Eagle.liftMotor.setPower(1);
         while (Eagle.liftMotor.isBusy()){
             idle();
         }

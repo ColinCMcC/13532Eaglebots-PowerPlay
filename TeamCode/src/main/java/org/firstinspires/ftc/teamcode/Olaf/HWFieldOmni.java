@@ -71,6 +71,7 @@ public class HWFieldOmni {
         BLMotor.setPower(0.0);
         BRMotor.setPower(0.0);
         FRMotor.setPower(0.0);
+
         // Sets the parameters of the IMU in the control hub
         imu = hwMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
