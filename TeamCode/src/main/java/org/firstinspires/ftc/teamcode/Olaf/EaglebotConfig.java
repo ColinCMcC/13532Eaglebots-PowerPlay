@@ -159,10 +159,11 @@ public class EaglebotConfig {
     }// End checkData function
 
 
-    public void move(double drive, double strafe, double turn, boolean boost){
+    public void move(double drive, double strafe, double turn, boolean boost) {
         double max;
         double leftAdj = 1;
         double rightAdj = 0.95;
+        double scale = 0;
 
         // when boost is true speeds to full speed otherwise reduced
         if (boost) {
@@ -171,11 +172,29 @@ public class EaglebotConfig {
             max = 0.33;
         }
 
+        // Calculate power for driving
+        double FL = ((drive - strafe - turn) * max) * leftAdj;
+        double BL = ((drive + strafe - turn) * max) * leftAdj;
+        double BR = ((drive - strafe + turn) * max) * rightAdj;
+        double FR = ((drive + strafe + turn) * max) * rightAdj;
+
+        // If any value is over 1 or -1 scale by that amount
+        double absFL = Math.abs(FL);
+        double absBL = Math.abs(BL);
+        double absBR = Math.abs(BR);
+        double absFR = Math.abs(FR);
+
+        if (absFL > 1 || absBL > 1 || absBR > 1 || absFR > 1) {
+            scale = Math.max(Math.max(absFL, absFR), Math.max(absBL, absBR));
+        }else {
+            scale = 1;
+        }
+
         //send calculated power to wheels
-        FLMotor.setPower(((drive - strafe - turn) * max) * leftAdj);
-        BLMotor.setPower(((drive + strafe - turn) * max) * leftAdj);
-        BRMotor.setPower(((drive - strafe + turn) * max) * rightAdj);
-        FRMotor.setPower(((drive + strafe + turn) * max) * rightAdj);
+        FLMotor.setPower(FL * scale);
+        BLMotor.setPower(BL * scale);
+        BRMotor.setPower(BR * scale);
+        FRMotor.setPower(FR * scale);
     }// End move
 
 
