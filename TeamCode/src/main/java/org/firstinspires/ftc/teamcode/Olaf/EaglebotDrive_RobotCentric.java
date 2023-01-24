@@ -42,7 +42,7 @@ public class EaglebotDrive_RobotCentric extends LinearOpMode {
             while (opModeIsActive()) {
                 Eagle.checkData();//sends debug info to datapad
 
-                Eagle.fieldMove(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.a);
+                Eagle.fieldMove(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.a);
                 Eagle.lift(-gamepad2.left_stick_y, gamepad2.right_trigger, gamepad2.a);
             }//end while opModeIsActive
     }//end void runOpMode

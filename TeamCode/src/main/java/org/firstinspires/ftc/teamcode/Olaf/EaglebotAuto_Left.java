@@ -77,7 +77,7 @@ public class EaglebotAuto_Left extends LinearOpMode {
         Eagle.liftMotor.setPower(1);
         while (Eagle.liftMotor.isBusy()){
             idle();
-        }// Pause to let motor reach position
+        }
 
         // Moves to the pole at the top right of B2
         while (opModeIsActive() && Eagle.leftDist.getDistance(DistanceUnit.INCH) < 40){
@@ -100,7 +100,7 @@ public class EaglebotAuto_Left extends LinearOpMode {
         }
 
         // Moves to the center of B3
-        while (opModeIsActive() && Eagle.backDist.getDistance(DistanceUnit.INCH) < 40){
+        while (opModeIsActive() && Eagle.backDist.getDistance(DistanceUnit.INCH) < 48){
             double turnPower = Eagle.getHeading();// Keeps robot straight
 
             Eagle.move(-0.3, 0, turnPower / 20, true);
